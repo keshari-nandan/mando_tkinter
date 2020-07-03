@@ -1,5 +1,5 @@
 from tkinter import *
-from win import Win
+from wins import Language
 
 
 class App:
@@ -9,7 +9,7 @@ class App:
         if title is not None:
             self.root.title = window_title + ' - ' + title
         self.root.title(window_title)
-        self.window = Win(self)
+        self.window = Language(self)
 
     def switchWindow(self, window):
         self.window.destroy()

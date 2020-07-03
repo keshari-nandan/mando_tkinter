@@ -1,4 +1,4 @@
-from tkinter import Canvas, Button, X, BOTTOM
+from tkinter import *
 
 
 class Footer:
@@ -9,11 +9,11 @@ class Footer:
         self.canvas = Canvas(app.root, bg="white", height=60)
         self.canvas.pack(fill=X, side=BOTTOM)
         if nextWin:
-            self.next_btn = Button(app.root, text="Next", command=self.nextWindow)
-            self.next_btn.place(relx=0.9, rely=0.9)
+            self.next_btn = Button(self.canvas, bg="blue", fg="white", text="Next", command=self.nextWindow)
+            self.next_btn.pack(side=RIGHT)
         if prevWin:
-            self.next_btn = Button(app.root, text="Prev", command=self.prevWindow)
-            self.next_btn.place(relx=0.9, rely=0.9)
+            self.next_btn = Button(self.canvas, bg="white", fg="gray", text="Prev", command=self.prevWindow)
+            self.next_btn.pack(side=RIGHT)
 
     def nextWindow(self):
         if self.nextWin:
