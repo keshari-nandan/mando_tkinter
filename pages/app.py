@@ -1,5 +1,7 @@
 from tkinter import *
-from config import Config
+from .config import Config
+from .project import Project
+from .stats import Stats
 
 
 class App:
@@ -14,4 +16,9 @@ class App:
 
     def switchWindow(self, window):
         self.window.destroy()
-        self.window = window(self)
+        if window == 'stats':
+            self.window = Stats(self)
+        if window == 'config':
+            self.window = Config(self)
+        if window == 'project':
+            self.window = Project(self)
