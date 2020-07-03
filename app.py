@@ -1,4 +1,6 @@
 from tkinter import *
+from win import Win
+from footer import Footer
 
 
 class App(Tk):
@@ -8,8 +10,8 @@ class App(Tk):
         if title is not None:
             window_title = window_title + ' - ' + title
         super().__init__(className=window_title)
-        self.frame = Frame(self, height=400, width=600)
-        self.frame.pack()
+        self.window = Win(self)
+        self.footer = Footer(self)
 
 
 if __name__ == "__main__":
