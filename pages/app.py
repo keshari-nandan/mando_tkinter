@@ -7,11 +7,11 @@ from .stats import Stats
 class App:
     def __init__(self, title=None):
         self.root = Tk()
-        window_title = 'TheNandan'
+        window_title = 'Mando'
         if title is not None:
             self.root.title = window_title + ' - ' + title
         self.root.title(window_title)
-        self.root.geometry('{}x{}'.format(460, 350))
+        self.root.geometry('{}x{}'.format(500, 210))
         self.window = Config(self)
         self.root.mainloop()
 

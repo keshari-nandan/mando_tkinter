@@ -21,9 +21,9 @@ class Config(Base):
         # Programming Language Selection
         lang_label = Label(self.top_frame, text='Programming Language: ', padx=20)
         lang_label.grid(row=0, sticky="e")
-        default_lang = StringVar(self.top_frame)
-        default_lang.set(self.languages[0]) # default value
-        self.lang_val = OptionMenu(self.top_frame, default_lang, *self.languages, command=self.langEvent)
+        self.default_lang = StringVar(self.top_frame)
+        self.default_lang.set(self.languages[0]) # default value
+        self.lang_val = OptionMenu(self.top_frame, self.default_lang, *self.languages, command=self.langEvent)
         self.lang_val.configure(width=10)
         self.lang_val.grid(row=0, column=1, sticky="w")
 
@@ -53,6 +53,42 @@ class Config(Base):
         self.server_val.configure(width=10)
         self.server_val.grid(row=3, column=1, sticky="w")
 
+
+        # Redis Configuration
+        redis_label = Label(self.top_frame, text='Redis: ', padx=20)
+        redis_label.grid(row=4, sticky="e")
+        self.redis_val = BooleanVar(self.top_frame)
+        self.redis_val.set(False)
+        self.redis_opt = Checkbutton(self.top_frame, var=self.redis_val)
+        self.redis_opt.grid(row=4, column=1, sticky="w")
+
+
+        # Message Broker
+        broker_label = Label(self.top_frame, text='Message Broker: ', padx=20)
+        broker_label.grid(row=5, sticky="e")
+        self.activemq_val = BooleanVar(self.top_frame)
+        self.activemq_val.set(False)
+        self.activemq_opt = Checkbutton(self.top_frame, text="ActiveMQ", var=self.activemq_val)
+        self.activemq_opt.grid(row=5, column=1, sticky="w")
+        self.rabbitmq_val = BooleanVar(self.top_frame)
+        self.rabbitmq_val.set(False)
+        self.rabbitmq_opt = Checkbutton(self.top_frame, text="RabbitMQ", var=self.rabbitmq_val)
+        self.rabbitmq_opt.grid(row=5, column=3, sticky="w")
+
+        # Submit Buttom
+        submit_btn = Button(self.center, text="Next", fg="white", bg="RoyalBlue1", activebackground="RoyalBlue2", relief="flat", width="8", command=self.nextClicked)
+        submit_btn.grid(row=7, column=3, sticky="e")
+
+
+    def nextClicked(self):
+        print(self.default_lang.get())
+        print(self.default_version.get())
+        print(self.default_server.get())
+        print(self.default_framework.get())
+        print(self.redis_val.get())
+        print(self.activemq_val.get())
+        print(self.rabbitmq_val.get())
+
         # lang_val = Entry(self.top_frame)
         # lang_val.grid(row=0, column=1)
 
@@ -69,16 +105,16 @@ class Config(Base):
         # entry_L.grid(row=1, column=3)
 
         # create the center widgets
-        self.center.grid_rowconfigure(0, weight=1)
-        self.center.grid_columnconfigure(1, weight=1)
-
-        ctr_left = Frame(self.center, bg='blue', width=100, height=190)
-        ctr_mid = Frame(self.center, bg='yellow', width=250, height=190, padx=3, pady=3)
-        ctr_right = Frame(self.center, bg='green', width=100, height=190, padx=3, pady=3)
-
-        ctr_left.grid(row=0, column=0, sticky="ns")
-        ctr_mid.grid(row=0, column=1, sticky="nsew")
-        ctr_right.grid(row=0, column=2, sticky="ns")
+        # self.center.grid_rowconfigure(0, weight=1)
+        # self.center.grid_columnconfigure(1, weight=1)
+        #
+        # ctr_left = Frame(self.center, bg='blue', width=100, height=190)
+        # ctr_mid = Frame(self.center, bg='yellow', width=250, height=190, padx=3, pady=3)
+        # ctr_right = Frame(self.center, bg='green', width=100, height=190, padx=3, pady=3)
+        #
+        # ctr_left.grid(row=0, column=0, sticky="ns")
+        # ctr_mid.grid(row=0, column=1, sticky="nsew")
+        # ctr_right.grid(row=0, column=2, sticky="ns")
 
     def langEvent(self, event):
         self.setFramework(event)
