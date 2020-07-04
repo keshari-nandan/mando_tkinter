@@ -97,7 +97,7 @@ class Config(Base):
             "activemq" : self.activemq_val.get(),
             "rabbitmq" : self.rabbitmq_val.get()
         }
-        file = open('config/settings.json', 'w')
+        file = open('settings/system.json', 'w')
         json.dump(config, file)
         file.close()
         self.app.switchWindow('project')
