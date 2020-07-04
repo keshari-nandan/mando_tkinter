@@ -11,7 +11,7 @@ class App:
         if title is not None:
             self.root.title = window_title + ' - ' + title
         self.root.title(window_title)
-        self.root.geometry('{}x{}'.format(500, 210))
+        # self.root.geometry('{}x{}'.format(500, 250))
         self.window = Config(self)
         self.root.mainloop()
 

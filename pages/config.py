@@ -1,20 +1,17 @@
 from tkinter import *
 from .footer import Footer
 from .base import Base
+import json
 
 
 class Config(Base):
     def __init__(self, app):
-        root = app.root
         self.languages = ['Php', 'Python']
         self.frameworks = ["Laravel", "Core Php"]
         self.servers = ['Nginx', 'Apache']
-        self.versions = ["Latest(7.4)", "7.4", "7.3", "7.2", "7.1", "7.0"]
-        super().__init__(root)
-
-        # layout all of the main containers
-        root.grid_rowconfigure(1, weight=1)
-        root.grid_columnconfigure(0, weight=1)
+        self.versions = ["7.4", "7.3", "7.2", "7.1", "7.0"]
+        self.databases = ["MySQL", "MariaDB", "PostgreSQL", "MongoDB"]
+        super().__init__(app, "Configuration")
 
 
 
@@ -53,27 +50,36 @@ class Config(Base):
         self.server_val.configure(width=10)
         self.server_val.grid(row=3, column=1, sticky="w")
 
+        # Databse Selection
+        db_label = Label(self.top_frame, text='Database : ', padx=20)
+        db_label.grid(row=4, sticky="e")
+        self.default_db = StringVar(self.top_frame)
+        self.default_db.set(self.databases[0]) # default value
+        self.db_val = OptionMenu(self.top_frame, self.default_db, *self.databases)
+        self.db_val.configure(width=10)
+        self.db_val.grid(row=4, column=1, sticky="w")
+
 
         # Redis Configuration
         redis_label = Label(self.top_frame, text='Redis: ', padx=20)
-        redis_label.grid(row=4, sticky="e")
+        redis_label.grid(row=5, sticky="e")
         self.redis_val = BooleanVar(self.top_frame)
         self.redis_val.set(False)
         self.redis_opt = Checkbutton(self.top_frame, var=self.redis_val)
-        self.redis_opt.grid(row=4, column=1, sticky="w")
+        self.redis_opt.grid(row=5, column=1, sticky="w")
 
 
         # Message Broker
         broker_label = Label(self.top_frame, text='Message Broker: ', padx=20)
-        broker_label.grid(row=5, sticky="e")
+        broker_label.grid(row=6, sticky="e")
         self.activemq_val = BooleanVar(self.top_frame)
         self.activemq_val.set(False)
         self.activemq_opt = Checkbutton(self.top_frame, text="ActiveMQ", var=self.activemq_val)
-        self.activemq_opt.grid(row=5, column=1, sticky="w")
+        self.activemq_opt.grid(row=6, column=1, sticky="w")
         self.rabbitmq_val = BooleanVar(self.top_frame)
         self.rabbitmq_val.set(False)
         self.rabbitmq_opt = Checkbutton(self.top_frame, text="RabbitMQ", var=self.rabbitmq_val)
-        self.rabbitmq_opt.grid(row=5, column=3, sticky="w")
+        self.rabbitmq_opt.grid(row=6, column=3, sticky="w")
 
         # Submit Buttom
         submit_btn = Button(self.center, text="Next", fg="white", bg="RoyalBlue1", activebackground="RoyalBlue2", relief="flat", width="8", command=self.nextClicked)
@@ -81,13 +87,64 @@ class Config(Base):
 
 
     def nextClicked(self):
-        print(self.default_lang.get())
-        print(self.default_version.get())
-        print(self.default_server.get())
-        print(self.default_framework.get())
-        print(self.redis_val.get())
-        print(self.activemq_val.get())
-        print(self.rabbitmq_val.get())
+        config = {
+            "langurage" : self.default_lang.get(),
+            "lang_version" : self.default_version.get(),
+            "framework" : self.default_framework.get(),
+            "server" : self.default_server.get(),
+            "database" : self.default_db.get(),
+            "redis" : self.redis_val.get(),
+            "activemq" : self.activemq_val.get(),
+            "rabbitmq" : self.rabbitmq_val.get()
+        }
+        file = open('config/settings.json', 'w')
+        json.dump(config, file)
+        file.close()
+        self.app.switchWindow('project')
+
+    def langEvent(self, event):
+        self.setFramework(event)
+        self.setVersion(event)
+        self.setServer(event)
+
+    def setFramework(self, event):
+        self.frameworks = []
+        self.default_framework.set("")
+        items = self.framework_val["menu"]
+        items.delete(0, "end")
+        if event == "Php":
+            self.frameworks = ["Laravel", "Core Php"]
+        if event == "Python":
+            self.frameworks = ["Django", "Flask", "Masonite"]
+        for item in self.frameworks:
+            items.add_command(label=item, command=lambda value=item: self.default_framework.set(value))
+        self.default_framework.set(self.frameworks[0])
+
+    def setVersion(self, event):
+        self.versions = []
+        self.default_version.set("")
+        items = self.version_val["menu"]
+        items.delete(0, "end")
+        if event == "Php":
+            self.versions = ["7.4", "7.3", "7.2", "7.1", "7.0"]
+        if event == "Python":
+            self.versions = ["3.8", "3.7", "3.6"]
+        for item in self.versions:
+            items.add_command(label=item, command=lambda value=item: self.default_version.set(value))
+        self.default_version.set(self.versions[0])
+
+    def setServer(self, event):
+        self.servers = []
+        self.default_server.set("")
+        items = self.server_val["menu"]
+        items.delete(0, "end")
+        if event == "Php":
+            self.servers = ['Nginx', 'Apache']
+        if event == "Python":
+            self.servers = ['Apache']
+        for item in self.servers:
+            items.add_command(label=item, command=lambda value=item: self.default_server.set(value))
+        self.default_server.set(self.servers[0])
 
         # lang_val = Entry(self.top_frame)
         # lang_val.grid(row=0, column=1)
@@ -115,54 +172,3 @@ class Config(Base):
         # ctr_left.grid(row=0, column=0, sticky="ns")
         # ctr_mid.grid(row=0, column=1, sticky="nsew")
         # ctr_right.grid(row=0, column=2, sticky="ns")
-
-    def langEvent(self, event):
-        self.setFramework(event)
-        self.setVersion(event)
-        self.setServer(event)
-
-    def setFramework(self, event):
-        self.frameworks = []
-        self.default_framework.set("")
-        items = self.framework_val["menu"]
-        items.delete(0, "end")
-        if event == "Php":
-            self.frameworks = ["Laravel", "Core Php"]
-        if event == "Python":
-            self.frameworks = ["Django", "Flask", "Masonite"]
-        for item in self.frameworks:
-            items.add_command(label=item, command=lambda value=item: self.default_framework.set(value))
-        self.default_framework.set(self.frameworks[0])
-
-    def setVersion(self, event):
-        self.versions = []
-        self.default_version.set("")
-        items = self.version_val["menu"]
-        items.delete(0, "end")
-        if event == "Php":
-            self.versions = ["Latest(7.4)", "7.4", "7.3", "7.2", "7.1", "7.0"]
-        if event == "Python":
-            self.versions = ["Latest(3.8)", "3.7", "3.6"]
-        for item in self.versions:
-            items.add_command(label=item, command=lambda value=item: self.default_version.set(value))
-        self.default_version.set(self.versions[0])
-
-    def setServer(self, event):
-        self.servers = []
-        self.default_server.set("")
-        items = self.server_val["menu"]
-        items.delete(0, "end")
-        if event == "Php":
-            self.servers = ['Nginx', 'Apache']
-        if event == "Python":
-            self.servers = ['Apache']
-        for item in self.servers:
-            items.add_command(label=item, command=lambda value=item: self.default_server.set(value))
-        self.default_server.set(self.servers[0])
-
-    def __str__(self):
-        return 'config'
-
-    def destroy(self):
-        self.frame.destroy()
-        #self.footer.canvas.destroy()

@@ -1,0 +1,1 @@
+{"langurage": "Php", "lang_version": "7.4", "framework": "Laravel", "server": "Nginx", "database": "MySQL", "redis": false, "activemq": false, "rabbitmq": false}
