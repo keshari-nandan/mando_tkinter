@@ -6,6 +6,9 @@ from .base import Base
 class Config(Base):
     def __init__(self, app):
         root = app.root
+        self.languages = ['Php', 'Python']
+        self.frameworks = ["Laravel", "Core Php"]
+        self.versions = []
         super().__init__(root)
 
         # layout all of the main containers
@@ -18,17 +21,19 @@ class Config(Base):
         lang_label = Label(self.top_frame, text='Programming Language: ', padx=20)
         lang_label.grid(row=0, sticky="e")
         default_lang = StringVar(self.top_frame)
-        default_lang.set("Php") # default value
-        lang_val = OptionMenu(self.top_frame, default_lang, "Php", "Python", command=self.langEvent)
-        lang_val.grid(row=0, column=1, sticky="w")
+        default_lang.set(self.languages[0]) # default value
+        self.lang_val = OptionMenu(self.top_frame, default_lang, "Php", "Python", command=self.langEvent)
+        self.lang_val.configure(width=20)
+        self.lang_val.grid(row=0, column=1, sticky="w")
 
 
-        lang_label = Label(self.top_frame, text='Web Server: ', padx=20)
-        lang_label.grid(row=2, sticky="e")
-        default_lang = StringVar(self.top_frame)
-        default_lang.set("Apache") # default value
-        lang_val = OptionMenu(self.top_frame, default_lang, "Apache", "Nginx")
-        lang_val.grid(row=2, column=1, sticky="w")
+        server_label = Label(self.top_frame, text='Web Server: ', padx=20)
+        server_label.grid(row=2, sticky="e")
+        self.default_server = StringVar(self.top_frame)
+        self.default_server.set(self.frameworks[0]) # default value
+        self.server_val = OptionMenu(self.top_frame, self.default_server, *self.frameworks)
+        self.server_val.configure(width=20)
+        self.server_val.grid(row=2, column=1, sticky="w")
 
         # lang_val = Entry(self.top_frame)
         # lang_val.grid(row=0, column=1)
@@ -58,7 +63,15 @@ class Config(Base):
         ctr_right.grid(row=0, column=2, sticky="ns")
 
     def langEvent(self, event):
-        print(event)
+        self.default_server.set("")
+        frmwrks = self.server_val["menu"]
+        frmwrks.delete(0, "end")
+        if event == "Php":
+            self.frameworks = ["Laravel", "Core Php"]
+        if event == "Python":
+            self.frameworks = ["Django", "Flask", "Masonite"]
+        for string in self.frameworks:
+            frmwrks.add_command(label=string, command=lambda value=string: self.default_server.set(value))
 
     def __str__(self):
         return 'config'
