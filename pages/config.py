@@ -77,7 +77,7 @@ class Config(Base):
         self.rabbitmq_opt.grid(row=6, column=3, sticky="w")
 
         # Submit Buttom
-        submit_btn = Button(self.center, text="Next", fg="white", bg="RoyalBlue1", activebackground="RoyalBlue2",
+        submit_btn = Button(self.center, text="Projects", fg="white", bg="RoyalBlue1", activebackground="RoyalBlue2",
                             relief="flat", width="8", command=self.nextClicked)
         submit_btn.grid(row=7, column=3, sticky="e")
 

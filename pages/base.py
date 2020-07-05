@@ -5,7 +5,7 @@ class Base(object):
 
     def __init__(self, app, text="Mando Setup"):
         self.app = app
-        self.top_frame = LabelFrame(app.root, width=450, height=50, pady=3, text=text)
+        self.top_frame = LabelFrame(app.root, width=450, height=50, pady=3, fg="blue", text=text)
         self.center = Frame(app.root, width=50, height=40, padx=3, pady=3)
         # self.btm_frame = Frame(root, bg='white', width=450, height=45, pady=3)
         # self.btm_frame2 = Frame(root, bg='lavender', width=450, height=60, pady=3)

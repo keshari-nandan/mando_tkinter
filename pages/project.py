@@ -9,29 +9,65 @@ import os
 
 
 class Project(Base):
+
     def __init__(self, app):
-        super().__init__(app, "Project Setup")
+        super().__init__(app, "Projects")
         self.newWindow = None
         self.name_val = None
         self.vhost_val = None
         self.dir_val = None
         row, column = app.root.grid_size()
         # Add new Project Button
-        new_project = Button(self.top_frame, text="Add Project", command=self.setupProject)
+        new_project = Button(self.top_frame, text="Add Project", cursor="hand1", command=self.setupProject)
         new_project.grid(row=1,sticky="e", columnspan=column)
 
-        canvas = Canvas(self.top_frame, height=1, bg = "gray")
-        canvas.create_line(15, 25, 200, 25)
-        canvas.grid(row=3, columnspan=column)
+        # Draw horizontal line
+        # canvas = Canvas(self.top_frame, height=1, bg = "gray")
+        # canvas.create_line(15, 25, 200, 25)
+        # canvas.grid(row=3, columnspan=column)
 
-        if not self.projectExist():
+        projects = self.getProjects()
+        if not projects:
             message = Message(self.top_frame, text="No Project", fg="green")
             message.config(width=100)
             message.grid(row=4, columnspan=column)
+        else:
+            next_row = 5
+            project_count = 1
+            for item in projects.values():
+                prjct = LabelFrame(self.top_frame,  width=450, height=50, pady=3, text=item["name"])
+                prjct.grid(row=next_row, sticky="ew")
+                next_row += 1
+                Label(prjct, text="Host: ", padx=20).grid(row=next_row, column=2, sticky="e")
+                Label(prjct, text=item["vhost"], padx=20).grid(row=next_row, column=3, sticky="w")
+                next_row += 1
+                Label(prjct, text="Directory: ", padx=20).grid(row=next_row, column=2, sticky="e")
+                Label(prjct, text=item["dir"], padx=20).grid(row=next_row, column=3, sticky="w")
+                next_row += 1
+                Button(prjct, text="Edit", bg="SkyBlue1", cursor="hand1").grid(row=next_row, column=3, sticky="e")
+                Button(prjct, text="Delete", bg="IndianRed1", cursor="hand1").grid(row=next_row, column=4, sticky="e")
+
+                next_row += 1
+                project_count += 1
+
+        # Bottom of page
+        back_btn = Button(self.center, text="Configuration", fg="white", bg="RoyalBlue1", activebackground="RoyalBlue2",
+                            relief="flat", width="12", cursor="hand1", command=self.previousPage)
+        back_btn.grid(sticky="w")
 
 
-    def projectExist(self):
-        return False
+
+    def previousPage(self):
+        self.app.switchWindow('config')
+
+    def getProjects(self):
+        try:
+            file_r = open("settings/projects.json", "r")
+            projects = json.load(file_r)
+            file_r.close()
+        except Exception:
+            return False
+        return projects
 
 
     def setupProject(self):
@@ -65,9 +101,14 @@ class Project(Base):
         submit_btn = Button(bottom, text="Submit", fg="white", bg="RoyalBlue1", activebackground="RoyalBlue2", relief="flat", width="8", command=self.submitProject)
         submit_btn.grid(row=7, column=3, sticky="e")
 
-
     def submitProject(self):
-        if not os.path.isdir(self.dir_val.get()):
+        if len(self.name_val.get()) <= 0:
+            messagebox.showerror("Error","Please enter project name", parent=self.newWindow)  
+        elif len(self.vhost_val.get()) <= 0:
+            messagebox.showerror("Error","Please enter virtual host", parent=self.newWindow) 
+        elif len(self.dir_val.get()) <= 0:
+            messagebox.showerror("Error","Please enter project directory path", parent=self.newWindow) 
+        elif not os.path.isdir(self.dir_val.get()):
             messagebox.showerror("Error","Invalid Project Directory: " + self.dir_val.get(), parent=self.newWindow)  
         else:
             data = {
@@ -89,9 +130,6 @@ class Project(Base):
             json.dump(projects, file_w)
             file_w.close()
             self.newWindow.destroy()
-
-
-
 
     def getProjectName(self, string):
         return ''.join(e for e in string if e.isalnum())
