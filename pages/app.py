@@ -11,6 +11,7 @@ class App:
         if title is not None:
             self.root.title = window_title + ' - ' + title
         self.root.title(window_title)
+        self.root.minsize(500, 250)
         # self.root.geometry('{}x{}'.format(500, 250))
         if not self.getProjects():
             self.window = Config(self)

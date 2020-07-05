@@ -28,24 +28,24 @@ class Project(Base):
 
         projects = self.getProjects()
         if not projects:
-            message = Message(self.top_frame, text="No Project", fg="green")
-            message.config(width=100)
+            message = Label(self.top_frame, text="No Project Exist.", fg="green")
+            message.config(width=50)
             message.grid(row=4, columnspan=column)
         else:
             next_row = 5
             project_count = 1
             for item in projects.values():
-                prjct = LabelFrame(self.top_frame,  width=450, height=50, pady=3, text=item["name"])
+                prjct = LabelFrame(self.top_frame, padx=3, pady=3, text=item["name"])
                 prjct.grid(row=next_row, sticky="ew")
                 next_row += 1
-                Label(prjct, text="Host: ", padx=20).grid(row=next_row, column=2, sticky="e")
-                Label(prjct, text=item["vhost"], padx=20).grid(row=next_row, column=3, sticky="w")
+                Label(prjct, text="Host: ", padx=10).grid(row=next_row, column=2, sticky="e")
+                Label(prjct, text=item["vhost"]).grid(row=next_row, column=3, sticky="w")
+                
+                Label(prjct, text="Directory: ", padx=10).grid(row=next_row, column=5, sticky="e")
+                Label(prjct, text=item["dir"]).grid(row=next_row, column=6, sticky="w")
                 next_row += 1
-                Label(prjct, text="Directory: ", padx=20).grid(row=next_row, column=2, sticky="e")
-                Label(prjct, text=item["dir"], padx=20).grid(row=next_row, column=3, sticky="w")
-                next_row += 1
-                Button(prjct, text="Edit", bg="SkyBlue1", cursor="hand1").grid(row=next_row, column=3, sticky="e")
-                Button(prjct, text="Delete", bg="IndianRed1", cursor="hand1").grid(row=next_row, column=4, sticky="e")
+                Button(prjct, text="Edit", bg="SkyBlue1", cursor="hand1", command=lambda name=item["name"]: self.editProject(name)).grid(row=next_row, column=5, sticky="e")
+                Button(prjct, text="Delete", bg="IndianRed1", cursor="hand1", command=lambda name=item["name"]: self.deleteProject(name)).grid(row=next_row, column=6, sticky="e")
 
                 next_row += 1
                 project_count += 1
@@ -56,23 +56,36 @@ class Project(Base):
         back_btn.grid(sticky="w")
 
 
+    def editProject(self, project):
+        self.setupProject(project=project)
+        
+
+    def deleteProject(self, project):
+        projects = self.getProjects()
+        if project in projects:
+            del projects[project]
+            self.storeProjects(projects)
+        self.refresh()
+        messagebox.showinfo("Success","Project [" + project + "] deleted successfully.", parent=self.top_frame)  
 
     def previousPage(self):
         self.app.switchWindow('config')
 
-    def getProjects(self):
-        try:
-            file_r = open("settings/projects.json", "r")
-            projects = json.load(file_r)
-            file_r.close()
-        except Exception:
-            return False
-        return projects
 
+    def setupProject(self, project=None):
+        window_text = "New Project"
+        projects = self.getProjects()
 
-    def setupProject(self):
+        if project is None:
+            data = {}
+        elif project in projects:
+            data = projects[project]
+            window_text = "Edit - " + project
+        else:
+            messagebox.showerror("Error","Project [" + project + "] does not exist.", parent=self.top_frame)
+
         self.newWindow = tk.Toplevel()
-        project = LabelFrame(self.newWindow, pady=3, text="New Project")
+        project = LabelFrame(self.newWindow, pady=3, text=window_text)
         bottom = Frame(self.newWindow, padx=3, pady=3)
         project.grid(row=0, sticky="ew")
         bottom.grid(row=7, sticky="e")
@@ -82,6 +95,8 @@ class Project(Base):
         name_label.grid(row=1, sticky="e")
         self.name_val = StringVar(project)
         name = Entry(project, width=30, textvariable=self.name_val)
+        if "name" in data:
+            self.name_val.set(data["name"])
         name.grid(row=1, column=1, sticky="w")
 
         #Virtual Host
@@ -89,6 +104,8 @@ class Project(Base):
         vhost_label.grid(row=2, sticky="e")
         self.vhost_val = StringVar(project)
         vhost = Entry(project, width=30, textvariable=self.vhost_val)
+        if "vhost" in data:
+            self.vhost_val.set(data["vhost"])
         vhost.grid(row=2, column=1, sticky="w")
 
         #Project Path
@@ -96,6 +113,8 @@ class Project(Base):
         dir_label.grid(row=3, sticky="e")
         self.dir_val = StringVar(project)
         dir = Entry(project, width=30, textvariable=self.dir_val)
+        if "dir" in data:
+            self.dir_val.set(data["dir"])
         dir.grid(row=3, column=1, sticky="w")
 
         submit_btn = Button(bottom, text="Submit", fg="white", bg="RoyalBlue1", activebackground="RoyalBlue2", relief="flat", width="8", command=self.submitProject)
@@ -117,19 +136,34 @@ class Project(Base):
                 "dir": self.dir_val.get(),
             }
             projectName = self.getProjectName(self.name_val.get())
-            projects = {}
-            try:
-                file_r = open("settings/projects.json", "r")
-                projects = json.load(file_r)
-                file_r.close()
-            except Exception:
-                pass
-
-            file_w = open("settings/projects.json", "w")
+            projects = self.getProjects()
             projects[projectName] = data
-            json.dump(projects, file_w)
-            file_w.close()
+            self.storeProjects(projects)
             self.newWindow.destroy()
+            messagebox.showinfo("Success","Project [" + projectName + "] stored successfully.", parent=self.top_frame)
+            self.refresh()
+
 
     def getProjectName(self, string):
         return ''.join(e for e in string if e.isalnum())
+
+
+    def storeProjects(self, data):
+        file_w = open("settings/projects.json", "w")
+        json.dump(data, file_w)
+        file_w.close()
+    
+
+    def getProjects(self):
+        try:
+            file_r = open("settings/projects.json", "r")
+            projects = json.load(file_r)
+            file_r.close()
+        except Exception:
+            projects = {}
+        return projects
+
+    def refresh(self):
+        app = self.app
+        self.destroy()
+        self.__init__(app)
