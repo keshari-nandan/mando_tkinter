@@ -1,16 +1,20 @@
 from tkinter import *
-from .footer import Footer
+from .base import Base
 
 
-class Stats:
+class Stats(Base):
     def __init__(self, app):
-        self.frame = LabelFrame(app.root, height=400, width=600, bg="snow2", text="Select Server")
-        self.frame.pack()
-        self.footer = Footer(app, prevWin='project')
+        super().__init__(app, "Dashboard")
+        
 
-    def __str__(self):
-        return 'stats'
+                # Bottom of page
+        row, column = app.root.grid_size()
+        next_btn = Button(self.center, text="Quit", fg="white", bg="RoyalBlue1", activebackground="RoyalBlue2",
+                            relief="flat", width="12", cursor="hand1")
+        next_btn.grid(row=row, column=column, sticky="e")
+        back_btn = Button(self.center, text="Projects", relief="flat", width="12", cursor="hand1", command=self.previousPage)
+        back_btn.grid(row=row, column=column - 1,sticky="w")
+    
 
-    def destroy(self):
-        self.frame.destroy()
-        self.footer.canvas.destroy()
+    def previousPage(self):
+        self.app.switchWindow('project')

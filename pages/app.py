@@ -13,10 +13,12 @@ class App:
         self.root.title(window_title)
         self.root.minsize(500, 250)
         # self.root.geometry('{}x{}'.format(500, 250))
-        if not self.getProjects():
+        if not self.getSystem():
             self.window = Config(self)
-        else:
+        elif not self.getProjects():
             self.window = Project(self)
+        else:
+            self.window = Stats(self)
         self.root.mainloop()
 
     def switchWindow(self, window):
@@ -37,3 +39,13 @@ class App:
         except Exception:
             return False
         return projects
+    
+
+    def getSystem(self):
+        try:
+            file_r = open("settings/system.json", "r")
+            system = json.load(file_r)
+            file_r.close()
+        except Exception:
+            return False
+        return system

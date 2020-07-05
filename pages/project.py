@@ -11,7 +11,7 @@ import os
 class Project(Base):
 
     def __init__(self, app):
-        super().__init__(app, "Projects")
+        super().__init__(app, "Projects Setup")
         self.newWindow = None
         self.name_val = None
         self.vhost_val = None
@@ -40,7 +40,7 @@ class Project(Base):
                 next_row += 1
                 Label(prjct, text="Host: ", padx=10).grid(row=next_row, column=2, sticky="e")
                 Label(prjct, text=item["vhost"]).grid(row=next_row, column=3, sticky="w")
-                
+
                 Label(prjct, text="Directory: ", padx=10).grid(row=next_row, column=5, sticky="e")
                 Label(prjct, text=item["dir"]).grid(row=next_row, column=6, sticky="w")
                 next_row += 1
@@ -51,9 +51,12 @@ class Project(Base):
                 project_count += 1
 
         # Bottom of page
-        back_btn = Button(self.center, text="Configuration", fg="white", bg="RoyalBlue1", activebackground="RoyalBlue2",
-                            relief="flat", width="12", cursor="hand1", command=self.previousPage)
-        back_btn.grid(sticky="w")
+        row, column = app.root.grid_size()
+        next_btn = Button(self.center, text="Dashboard", fg="white", bg="RoyalBlue1", activebackground="RoyalBlue2",
+                            relief="flat", width="12", cursor="hand1", command=self.nextPage)
+        next_btn.grid(row=row, column=column, sticky="e")
+        back_btn = Button(self.center, text="Configuration", relief="flat", width="12", cursor="hand1", command=self.previousPage)
+        back_btn.grid(row=row, column=column - 1,sticky="w")
 
 
     def editProject(self, project):
@@ -70,6 +73,10 @@ class Project(Base):
 
     def previousPage(self):
         self.app.switchWindow('config')
+
+
+    def nextPage(self):
+        self.app.switchWindow('stats')
 
 
     def setupProject(self, project=None):
