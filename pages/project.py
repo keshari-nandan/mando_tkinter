@@ -1,7 +1,11 @@
 from tkinter import *
 from tkinter import filedialog
+from tkinter import messagebox
 from .base import Base
+import tkinter as tk
 import json
+import validators
+import os
 
 
 class Project(Base):
@@ -31,7 +35,7 @@ class Project(Base):
 
 
     def setupProject(self):
-        self.newWindow = Toplevel()
+        self.newWindow = tk.Toplevel()
         project = LabelFrame(self.newWindow, pady=3, text="New Project")
         bottom = Frame(self.newWindow, padx=3, pady=3)
         project.grid(row=0, sticky="ew")
@@ -63,25 +67,28 @@ class Project(Base):
 
 
     def submitProject(self):
-        data = {
-            "name": self.name_val.get(),
-            "vhost": self.vhost_val.get(),
-            "dir": self.dir_val.get(),
-        }
-        projectName = self.getProjectName(self.name_val.get())
-        projects = {}
-        try:
-            file_r = open("settings/projects.json", "r")
-            projects = json.load(file_r)
-            file_r.close()
-        except Exception:
-            pass
+        if not os.path.isdir(self.dir_val.get()):
+            messagebox.showerror("Error","Invalid Project Directory: " + self.dir_val.get(), parent=self.newWindow)  
+        else:
+            data = {
+                "name": self.name_val.get(),
+                "vhost": self.vhost_val.get(),
+                "dir": self.dir_val.get(),
+            }
+            projectName = self.getProjectName(self.name_val.get())
+            projects = {}
+            try:
+                file_r = open("settings/projects.json", "r")
+                projects = json.load(file_r)
+                file_r.close()
+            except Exception:
+                pass
 
-        file_w = open("settings/projects.json", "w")
-        projects[projectName] = data
-        json.dump(projects, file_w)
-        file_w.close()
-        self.newWindow.destroy()
+            file_w = open("settings/projects.json", "w")
+            projects[projectName] = data
+            json.dump(projects, file_w)
+            file_w.close()
+            self.newWindow.destroy()
 
 
 

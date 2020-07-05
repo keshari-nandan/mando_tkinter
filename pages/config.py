@@ -97,6 +97,7 @@ class Config(Base):
         file.close()
         self.app.switchWindow('project')
 
+
     def langEvent(self, event):
         self.setFramework(event)
         self.setVersion(event)
